@@ -7,7 +7,6 @@ export async function loadExchangeState() {
   const exchangeState: ExchangeState = {};
 
   const keys = await redisClient.keys('*');
-  console.log('Keys', keys);
 
   const currencies = CURRENCIES.filter((currency) => currency !== CURRENCY.UAH);
   const pipeline = redisClient.pipeline();
@@ -18,8 +17,6 @@ export async function loadExchangeState() {
   if (!res) {
     throw new Error(`Cannot get exchange rates from redis`);
   }
-
-  console.log('Res: ', res);
 
   currencies.forEach((currency, index) => {
     const [error, value] = res[index];
