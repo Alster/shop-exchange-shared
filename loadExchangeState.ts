@@ -1,33 +1,29 @@
-import { createExchangeKey, ExchangeState, parseExchange } from './helpers';
-import { CURRENCIES, CURRENCY } from '../shop-shared/constants/exchange';
-import { redisClient } from './redisConnection';
-import { applyStaticExchange } from './staticStore';
+import { CURRENCIES, CURRENCY } from "../shop-shared/constants/exchange";
+import { createExchangeKey, ExchangeState, parseExchange } from "./helpers";
+import { redisClient } from "./redisConnection";
+import { applyStaticExchange } from "./staticStore";
 
 export async function loadExchangeState() {
-  const exchangeState: ExchangeState = {};
+	const exchangeState: ExchangeState = {};
 
-  const keys = await redisClient.keys('*');
+	const currencies = CURRENCIES.filter((currency) => currency !== CURRENCY.UAH);
+	const pipeline = redisClient.pipeline();
+	for (const currency of currencies) pipeline.get(createExchangeKey(currency, CURRENCY.UAH));
+	const response = await pipeline.exec();
+	if (!response) {
+		throw new Error(`Cannot get exchange rates from redis`);
+	}
 
-  const currencies = CURRENCIES.filter((currency) => currency !== CURRENCY.UAH);
-  const pipeline = redisClient.pipeline();
-  currencies.forEach((currency) =>
-    pipeline.get(createExchangeKey(currency, CURRENCY.UAH)),
-  );
-  const res = await pipeline.exec();
-  if (!res) {
-    throw new Error(`Cannot get exchange rates from redis`);
-  }
+	for (const [index, currency] of currencies.entries()) {
+		const [error, value] = response[index];
+		if (error) {
+			throw error;
+		}
+		const key = createExchangeKey(currency, CURRENCY.UAH);
+		exchangeState[key] = parseExchange(value as string);
+	}
 
-  currencies.forEach((currency, index) => {
-    const [error, value] = res[index];
-    if (error) {
-      throw error;
-    }
-    const key = createExchangeKey(currency, CURRENCY.UAH);
-    exchangeState[key] = parseExchange(value as string);
-  });
+	applyStaticExchange(exchangeState);
 
-  applyStaticExchange(exchangeState);
-
-  return exchangeState;
+	return exchangeState;
 }

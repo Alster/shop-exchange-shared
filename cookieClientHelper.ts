@@ -1,13 +1,13 @@
-import { setCookie as setC, getCookie as getC } from 'cookies-next';
+import { getCookie as getC, setCookie as setC } from "cookies-next";
 
 export function setCookie(cname: string, cvalue: string, exdays: number) {
-    setC(cname, cvalue, { maxAge: exdays * 24 * 60 * 60 });
+	setC(cname, cvalue, { maxAge: exdays * 24 * 60 * 60 });
 }
 
 export function getCookie(cname: string) {
-    return getC(cname);
+	return getC(cname);
 }
 
 export function removeCookie(cname: string) {
-    setC(cname, "", { maxAge: 0 });
+	setC(cname, "", { maxAge: 0 });
 }
