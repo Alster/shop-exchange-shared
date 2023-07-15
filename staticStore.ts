@@ -4,7 +4,7 @@ let staticExchange: ExchangeState = {};
 
 const awaiters: ((argument: ExchangeState) => void)[] = [];
 
-export function applyStaticExchange(exchange: ExchangeState) {
+export function applyStaticExchange(exchange: ExchangeState): void {
 	staticExchange = exchange;
 	for (const resolve of awaiters) resolve(exchange);
 	awaiters.length = 0;

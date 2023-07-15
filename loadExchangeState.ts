@@ -1,14 +1,14 @@
-import { CURRENCIES, CURRENCY } from "../shop-shared/constants/exchange";
+import { CURRENCIES, CurrencyEnum } from "../shop-shared/constants/exchange";
 import { createExchangeKey, ExchangeState, parseExchange } from "./helpers";
 import { redisClient } from "./redisConnection";
 import { applyStaticExchange } from "./staticStore";
 
-export async function loadExchangeState() {
+export async function loadExchangeState(): Promise<ExchangeState> {
 	const exchangeState: ExchangeState = {};
 
-	const currencies = CURRENCIES.filter((currency) => currency !== CURRENCY.UAH);
+	const currencies = CURRENCIES.filter((currency) => currency !== CurrencyEnum.UAH);
 	const pipeline = redisClient.pipeline();
-	for (const currency of currencies) pipeline.get(createExchangeKey(currency, CURRENCY.UAH));
+	for (const currency of currencies) pipeline.get(createExchangeKey(currency, CurrencyEnum.UAH));
 	const response = await pipeline.exec();
 	if (!response) {
 		throw new Error(`Cannot get exchange rates from redis`);
@@ -19,7 +19,7 @@ export async function loadExchangeState() {
 		if (error) {
 			throw error;
 		}
-		const key = createExchangeKey(currency, CURRENCY.UAH);
+		const key = createExchangeKey(currency, CurrencyEnum.UAH);
 		exchangeState[key] = parseExchange(value as string);
 	}
 

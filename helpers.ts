@@ -1,4 +1,4 @@
-import { CURRENCY, CURRENCY_TO_ISO_4217 } from "../shop-shared/constants/exchange";
+import { CURRENCY_TO_ISO_4217, CurrencyEnum } from "../shop-shared/constants/exchange";
 
 export type ExchangeType = {
 	buy: number;
@@ -6,7 +6,7 @@ export type ExchangeType = {
 };
 export type ExchangeState = Record<string, ExchangeType>;
 
-export const createExchangeKey = (currencyFrom: CURRENCY, currencyTo: CURRENCY) => {
+export const createExchangeKey = (currencyFrom: CurrencyEnum, currencyTo: CurrencyEnum): string => {
 	return `${CURRENCY_TO_ISO_4217[currencyFrom]}_${CURRENCY_TO_ISO_4217[currencyTo]}`;
 };
 

@@ -1,10 +1,10 @@
-import { CURRENCY } from "../shop-shared/constants/exchange";
+import { CurrencyEnum } from "../shop-shared/constants/exchange";
 import { MoneySmall } from "../shop-shared/dto/primitiveTypes";
 import { createExchangeKey, ExchangeState } from "./helpers";
 
 export const doExchange = (
-	currencyFrom: CURRENCY,
-	currencyTo: CURRENCY,
+	currencyFrom: CurrencyEnum,
+	currencyTo: CurrencyEnum,
 	amount: MoneySmall,
 	exchangeState: ExchangeState,
 ): MoneySmall => {
@@ -12,11 +12,11 @@ export const doExchange = (
 		return amount;
 	}
 
-	if (currencyTo === CURRENCY.UAH) {
+	if (currencyTo === CurrencyEnum.UAH) {
 		const key = createExchangeKey(currencyFrom, currencyTo);
 		const exchange = exchangeState[key];
 		return Math.floor((amount as number) * exchange.sell);
-	} else if (currencyFrom === CURRENCY.UAH) {
+	} else if (currencyFrom === CurrencyEnum.UAH) {
 		const key = createExchangeKey(currencyTo, currencyFrom);
 		const exchange = exchangeState[key];
 		return Math.floor((amount as number) / exchange.sell);
