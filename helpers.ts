@@ -4,6 +4,7 @@ export type ExchangeType = {
 	buy: number;
 	sell: number;
 };
+
 export type ExchangeState = Record<string, ExchangeType>;
 
 export const createExchangeKey = (currencyFrom: CurrencyEnum, currencyTo: CurrencyEnum): string => {
