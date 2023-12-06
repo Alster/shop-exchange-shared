@@ -2,6 +2,7 @@ import { CURRENCIES, CurrencyEnum } from "../shop-shared/constants/exchange";
 import { createExchangeKey, ExchangeState, parseExchange } from "./helpers";
 import { redisClient } from "./redisConnection";
 import { applyStaticExchange } from "./staticStore";
+import * as assert from "assert";
 
 export async function loadExchangeState(): Promise<ExchangeState> {
 	const exchangeState: ExchangeState = {};
@@ -15,7 +16,9 @@ export async function loadExchangeState(): Promise<ExchangeState> {
 	}
 
 	for (const [index, currency] of currencies.entries()) {
-		const [error, value] = response[index];
+		const responseEntry = response[index];
+		assert.ok(responseEntry, `Cannot get exchange rate for ${currency}`);
+		const [error, value] = responseEntry;
 		if (error) {
 			throw error;
 		}
