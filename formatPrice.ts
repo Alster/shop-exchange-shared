@@ -2,10 +2,10 @@ import { CURRENCY_TO_SYMBOL, CurrencyEnum } from "../shop-shared/constants/excha
 import { MoneyBig } from "../shop-shared/dto/primitiveTypes";
 
 export function formatPrice<
-	const Price extends number & MoneyBig,
+	const Price extends MoneyBig,
 	const TargetCurrency extends CurrencyEnum,
 >(price: Price, currency: TargetCurrency): string {
-	let priceString = price.toFixed(2);
+	let priceString = Number(price).toFixed(2);
 	if (priceString.endsWith(".00")) {
 		priceString = priceString.slice(0, -3);
 	}
