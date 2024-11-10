@@ -1,6 +1,7 @@
 import * as assert from "assert";
 
 import { CURRENCIES, CurrencyEnum } from "@/shop-shared/constants/exchange";
+import { getErrorWithStack } from "@/shop-shared/utils/getErrorWithStack";
 
 import { createExchangeKey, ExchangeState, parseExchange } from "./helpers";
 import { redisClient } from "./redisConnection";
@@ -10,7 +11,13 @@ export async function loadExchangeState(): Promise<ExchangeState> {
 	const exchangeState: ExchangeState = {};
 	const currencies = CURRENCIES.filter((currency) => currency !== CurrencyEnum.UAH);
 
+	if (process.env["EXCHANGE_MOCK"] === "true") {
+		applyStaticExchange(exchangeState);
+		return exchangeState;
+	}
+
 	try {
+		assert.ok(redisClient);
 		const pipeline = redisClient.pipeline();
 
 		for (const currency of currencies)
@@ -36,7 +43,7 @@ export async function loadExchangeState(): Promise<ExchangeState> {
 
 		return exchangeState;
 	} catch (error) {
-		console.error(`Cannot load exchange state: ${error}`);
+		console.error(...getErrorWithStack(error, "Cannot load exchange state"));
 		return exchangeState;
 	}
 }
