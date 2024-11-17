@@ -7,8 +7,13 @@ import { createExchangeKey, ExchangeState, parseExchange } from "./helpers";
 import { redisClient } from "./redisConnection";
 import { applyStaticExchange } from "./staticStore";
 
+const exchangeState: ExchangeState = {};
+
 export async function loadExchangeState(): Promise<ExchangeState> {
-	const exchangeState: ExchangeState = {};
+	if (Object.keys(exchangeState).length > 0) {
+		applyStaticExchange(exchangeState);
+		return exchangeState;
+	}
 	const currencies = CURRENCIES.filter((currency) => currency !== CurrencyEnum.UAH);
 
 	if (process.env["EXCHANGE_MOCK"] === "true") {
